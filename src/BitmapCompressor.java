@@ -23,7 +23,7 @@
  *  @author Robert Sedgewick
  *  @author Kevin Wayne
  *  @author Zach Blick
- *  @author YOUR NAME HERE
+ *  @author Kieran Pichai
  */
 public class BitmapCompressor {
 
@@ -32,10 +32,34 @@ public class BitmapCompressor {
      * and writes the results to standard output.
      */
     public static void compress() {
-
-        // TODO: complete compress()
-
-        BinaryStdOut.close();
+        boolean previousBit = false;
+        int count = 0;
+        while (!BinaryStdIn.isEmpty()) {
+            boolean currBit = BinaryStdIn.readBoolean();
+            if (currBit != previousBit) {
+                if (count <= 6) {
+                    BinaryStdOut.write(false);
+                    for (int i = 0; i < count; i++) {
+                        BinaryStdOut.write(previousBit);
+                    }
+                } else {
+                    BinaryStdOut.write(true);
+                    BinaryStdOut.write(previousBit);
+                    BinaryStdOut.write(count, 6);
+                }
+                previousBit = currBit;
+                count = 1;
+            } else {
+                if (count == 63) {
+                    BinaryStdOut.write(true);
+                    BinaryStdOut.write(previousBit);
+                    BinaryStdOut.write(count, 6);
+                    count = 0;
+                }
+                count++;
+            }
+            BinaryStdOut.close();
+        }
     }
 
     /**
@@ -43,9 +67,6 @@ public class BitmapCompressor {
      * and writes the results to standard output.
      */
     public static void expand() {
-
-        // TODO: complete expand()
-
         BinaryStdOut.close();
     }
 
