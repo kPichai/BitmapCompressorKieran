@@ -58,8 +58,8 @@ public class BitmapCompressor {
                 }
                 count++;
             }
-            BinaryStdOut.close();
         }
+        BinaryStdOut.close();
     }
 
     /**
