@@ -37,7 +37,7 @@ public class BitmapCompressor {
         while (!BinaryStdIn.isEmpty()) {
             boolean currBit = BinaryStdIn.readBoolean();
             if (currBit != previousBit) {
-                if (count <= 6) {
+                if (count <= 8) {
                     BinaryStdOut.write(false);
                     for (int i = 0; i < count; i++) {
                         BinaryStdOut.write(previousBit);
@@ -59,6 +59,16 @@ public class BitmapCompressor {
                 count++;
             }
         }
+        if (count <= 8) {
+            BinaryStdOut.write(false);
+            for (int i = 0; i < count; i++) {
+                BinaryStdOut.write(previousBit);
+            }
+        } else {
+            BinaryStdOut.write(true);
+            BinaryStdOut.write(previousBit);
+            BinaryStdOut.write(count, 6);
+        }
         BinaryStdOut.close();
     }
 
@@ -67,6 +77,22 @@ public class BitmapCompressor {
      * and writes the results to standard output.
      */
     public static void expand() {
+        boolean isCompressed;
+        boolean isZero;
+        while (!BinaryStdIn.isEmpty()) {
+            isCompressed = BinaryStdIn.readBoolean();
+            if (isCompressed) {
+                isZero = BinaryStdIn.readBoolean();
+                char c = BinaryStdIn.readChar(6);
+                for (int i = 0; i < c; i++) {
+                    BinaryStdOut.write(!isZero);
+                }
+            } else {
+                for (int i = 0; i < 7; i++) {
+                    BinaryStdOut.write(BinaryStdIn.readBoolean());
+                }
+            }
+        }
         BinaryStdOut.close();
     }
 
