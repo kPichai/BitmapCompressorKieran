@@ -37,24 +37,17 @@ public class BitmapCompressor {
         int count = 0;
         while (!BinaryStdIn.isEmpty()) {
             currBit = BinaryStdIn.readBoolean();
-            if (currBit != previousBit) {
+            if (currBit == previousBit) {
+                count++;
                 if (count > 255) {
-                    int minCount = 0;
-                    while (minCount <= count - 255) {
-                        BinaryStdOut.write(255, 8);
-                        BinaryStdOut.write(0, 8);
-                        minCount += 255;
-                    }
-                    if (count - minCount != 0) {
-                        BinaryStdOut.write(count - minCount, 8);
-                    }
-                } else {
-                    BinaryStdOut.write(count, 8);
+                    BinaryStdOut.write(255, 8);
+                    BinaryStdOut.write(0, 8);
+                    count = 1;
                 }
+            } else {
+                BinaryStdOut.write(count, 8);
                 count = 1;
                 previousBit = !previousBit;
-            } else {
-                count++;
             }
         }
         BinaryStdOut.close();
