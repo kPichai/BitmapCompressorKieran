@@ -33,17 +33,21 @@ public class BitmapCompressor {
      */
     public static void compress() {
         boolean previousBit = false;
+        boolean currBit;
         int count = 0;
         while (!BinaryStdIn.isEmpty()) {
-            boolean currBit = BinaryStdIn.readBoolean();
+            currBit = BinaryStdIn.readBoolean();
             if (currBit != previousBit) {
                 if (count > 255) {
-                    byte max = (byte)255;
-                    byte zero = (byte)0;
-                    byte remaining = (byte)(count - 255);
-                    BinaryStdOut.write(max);
-                    BinaryStdOut.write(zero);
-                    BinaryStdOut.write(remaining);
+                    int minCount = 0;
+                    while (minCount <= count - 255) {
+                        BinaryStdOut.write(255, 8);
+                        BinaryStdOut.write(0, 8);
+                        minCount += 255;
+                    }
+                    if (count - minCount != 0) {
+                        BinaryStdOut.write(count - minCount, 8);
+                    }
                 } else {
                     BinaryStdOut.write(count, 8);
                 }
@@ -61,19 +65,12 @@ public class BitmapCompressor {
      * and writes the results to standard output.
      */
     public static void expand() {
-        byte x;
+        char curByte;
         boolean previousBit = false;
         while (!BinaryStdIn.isEmpty()) {
-            x = BinaryStdIn.readByte();
-            if (x == 0) {
-                x = BinaryStdIn.readByte();
-                for (int i = 0; i < (int)x; i++) {
-                    BinaryStdOut.write(previousBit);
-                }
-            } else {
-                for (int i = 0; i < (int)x; i++) {
-                    BinaryStdOut.write(previousBit);
-                }
+            curByte = BinaryStdIn.readChar(8);
+            for (int i = 0; i < curByte; i++) {
+                BinaryStdOut.write(previousBit);
             }
             previousBit = !previousBit;
         }
