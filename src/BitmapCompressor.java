@@ -26,30 +26,34 @@
  *  @author Kieran Pichai
  */
 public class BitmapCompressor {
-
+    static int maxBits;
     /**
      * Reads a sequence of bits from standard input, compresses them,
      * and writes the results to standard output.
      */
     public static void compress() {
+        int maxLength = (int)Math.pow(2, maxBits) - 1;
         boolean previousBit = false;
         boolean currBit;
         int count = 0;
+        BinaryStdOut.write(maxBits, 8);
         while (!BinaryStdIn.isEmpty()) {
             currBit = BinaryStdIn.readBoolean();
             if (currBit == previousBit) {
                 count++;
-                if (count > 255) {
-                    BinaryStdOut.write(255, 8);
-                    BinaryStdOut.write(0, 8);
+                if (count > maxLength) {
+                    BinaryStdOut.write(maxLength, maxBits);
+                    BinaryStdOut.write(0, maxBits);
                     count = 1;
                 }
             } else {
-                BinaryStdOut.write(count, 8);
+                BinaryStdOut.write(count, maxBits);
                 count = 1;
                 previousBit = !previousBit;
             }
         }
+        BinaryStdOut.write(count, maxBits);
+        BinaryStdOut.flush();
         BinaryStdOut.close();
     }
 
@@ -58,10 +62,11 @@ public class BitmapCompressor {
      * and writes the results to standard output.
      */
     public static void expand() {
-        char curByte;
+        int max = BinaryStdIn.readInt(6);
+        int curByte;
         boolean previousBit = false;
         while (!BinaryStdIn.isEmpty()) {
-            curByte = BinaryStdIn.readChar(8);
+            curByte = BinaryStdIn.readInt(max);
             for (int i = 0; i < curByte; i++) {
                 BinaryStdOut.write(previousBit);
             }
@@ -77,7 +82,11 @@ public class BitmapCompressor {
      * @param args the command-line arguments
      */
     public static void main(String[] args) {
-        if      (args[0].equals("-")) compress();
+        if (args[0].equals("-")) {
+            maxBits = Integer.parseInt(args[1]);
+            System.out.println(maxBits);
+            compress();
+        }
         else if (args[0].equals("+")) expand();
         else throw new IllegalArgumentException("Illegal command line argument");
     }
