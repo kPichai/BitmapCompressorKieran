@@ -87,7 +87,7 @@ public class BitmapCompressor {
             for (int j = 0; j < curByte; j++) {
                 BinaryStdOut.write(previousBit);
             }
-            // Flips
+            // Flips bit to ensure we have alternating expansion pattern
             previousBit = !previousBit;
         }
         BinaryStdOut.close();
@@ -101,6 +101,7 @@ public class BitmapCompressor {
      */
     public static void main(String[] args) {
         if (args[0].equals("-")) {
+            // Reads in code length for codes indicated in the terminal, allows to explore different compression ratios
             compress(Integer.parseInt(args[1]));
         }
         else if (args[0].equals("+")) expand();
