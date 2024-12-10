@@ -32,35 +32,40 @@ public class BitmapCompressor {
      * Reads a sequence of bits from standard input, compresses them,
      * and writes the results to standard output.
      */
+    // Compress algorithm that reads a file in and writes out a compressed version
     public static void compress(int maxBitsCompressing) {
+        // Takes in a specified number of bits for codes (user chosen) and calculates the max repeats it can store
         int maxLength = (int)Math.pow(2, maxBitsCompressing) - 1;
         ArrayList<Integer> runLengths = new ArrayList<Integer>();
         boolean previousBit = false;
         boolean currBit;
         int count = 0;
+        // While loop reads in data bit by bit
         while (!BinaryStdIn.isEmpty()) {
             currBit = BinaryStdIn.readBoolean();
+            // Checks if you have a match with your previous bit
             if (currBit == previousBit) {
                 count++;
+                // Resets and appends count to arraylist in case you exceed max repeats storable in one code
                 if (count > maxLength) {
                     runLengths.add(maxLength);
                     runLengths.add(0);
-//                    BinaryStdOut.write(maxLength, maxBitsCompressing);
-//                    BinaryStdOut.write(0, maxBitsCompressing);
                     count = 1;
                 }
             } else {
-//                BinaryStdOut.write(count, maxBitsCompressing);
+                // Lose count so adds current count to arraylist
                 runLengths.add(count);
                 count = 1;
                 previousBit = !previousBit;
             }
         }
+        // Writes out number of bits for code, total num of codes, then each code
         BinaryStdOut.write(maxBitsCompressing, 8);
         BinaryStdOut.write(runLengths.size()+1);
         for (int cur : runLengths) {
             BinaryStdOut.write(cur, maxBitsCompressing);
         }
+        // Writes out final code
         BinaryStdOut.write(count, maxBitsCompressing);
         BinaryStdOut.close();
     }
@@ -69,16 +74,20 @@ public class BitmapCompressor {
      * Reads a sequence of bits from standard input, decodes it,
      * and writes the results to standard output.
      */
+    // Expand function that reads in a compressed file and losslessly expands it
     public static void expand() {
+        // Reads in both num bits allocated to a code and total num of repeats
         int max = BinaryStdIn.readInt(8);
         int numRepeatCodes = BinaryStdIn.readInt();
         int curByte;
         boolean previousBit = false;
+        // Loops through num of repeats and reads in max at a time
         for (int i = 0; i < numRepeatCodes; i++) {
             curByte = BinaryStdIn.readInt(max);
             for (int j = 0; j < curByte; j++) {
                 BinaryStdOut.write(previousBit);
             }
+            // Flips
             previousBit = !previousBit;
         }
         BinaryStdOut.close();
