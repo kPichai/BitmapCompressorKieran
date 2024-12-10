@@ -16,6 +16,8 @@
  *  1240 bits
  ******************************************************************************/
 
+import java.util.ArrayList;
+
 /**
  *  The {@code BitmapCompressor} class provides static methods for compressing
  *  and expanding a binary bitmap input.
@@ -32,24 +34,32 @@ public class BitmapCompressor {
      */
     public static void compress(int maxBitsCompressing) {
         int maxLength = (int)Math.pow(2, maxBitsCompressing) - 1;
+        ArrayList<Integer> runLengths = new ArrayList<Integer>();
         boolean previousBit = false;
         boolean currBit;
         int count = 0;
-        BinaryStdOut.write(maxBitsCompressing, 8);
         while (!BinaryStdIn.isEmpty()) {
             currBit = BinaryStdIn.readBoolean();
             if (currBit == previousBit) {
                 count++;
                 if (count > maxLength) {
-                    BinaryStdOut.write(maxLength, maxBitsCompressing);
-                    BinaryStdOut.write(0, maxBitsCompressing);
+                    runLengths.add(maxLength);
+                    runLengths.add(0);
+//                    BinaryStdOut.write(maxLength, maxBitsCompressing);
+//                    BinaryStdOut.write(0, maxBitsCompressing);
                     count = 1;
                 }
             } else {
-                BinaryStdOut.write(count, maxBitsCompressing);
+//                BinaryStdOut.write(count, maxBitsCompressing);
+                runLengths.add(count);
                 count = 1;
                 previousBit = !previousBit;
             }
+        }
+        BinaryStdOut.write(maxBitsCompressing, 8);
+        BinaryStdOut.write(runLengths.size()+1);
+        for (int cur : runLengths) {
+            BinaryStdOut.write(cur, maxBitsCompressing);
         }
         BinaryStdOut.write(count, maxBitsCompressing);
         BinaryStdOut.close();
@@ -61,11 +71,12 @@ public class BitmapCompressor {
      */
     public static void expand() {
         int max = BinaryStdIn.readInt(8);
+        int numRepeatCodes = BinaryStdIn.readInt();
         int curByte;
         boolean previousBit = false;
-        while (!BinaryStdIn.isEmpty()) {
+        for (int i = 0; i < numRepeatCodes; i++) {
             curByte = BinaryStdIn.readInt(max);
-            for (int i = 0; i < curByte; i++) {
+            for (int j = 0; j < curByte; j++) {
                 BinaryStdOut.write(previousBit);
             }
             previousBit = !previousBit;
